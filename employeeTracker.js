@@ -1,3 +1,6 @@
+const inquirer = require('inquirer');
+const connection = require('db/connection');
+
 const runMenu = async () => {
     const answer = await inquirer.prompt({
         name: 'action',
@@ -53,3 +56,10 @@ const runMenu = async () => {
             break;
     }
 };
+
+
+
+connection.connect((err) => {
+    if (err) throw err;
+    runMenu();
+});
