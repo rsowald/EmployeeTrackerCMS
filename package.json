@@ -1,0 +1,27 @@
+{
+  "name": "employeetrackercms",
+  "version": "1.0.0",
+  "description": "cms to track employees, roles, and departments",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rsowald/EmployeeTrackerCMS.git"
+  },
+  "author": "rsowald",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rsowald/EmployeeTrackerCMS/issues"
+  },
+  "homepage": "https://github.com/rsowald/EmployeeTrackerCMS#readme",
+  "dependencies": {
+    "console.table": "^0.10.0",
+    "dotenv": "^8.2.0",
+    "inquirer": "^8.0.0",
+    "mysql2": "^2.2.5",
+    "sequelize": "^6.5.1"
+  }
+}
