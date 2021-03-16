@@ -60,42 +60,41 @@ const displayMenu = async () => {
 };
 
 const viewEmployees = async () => {
-    await connection.query(
+    const [rows] = await connection.execute(
         `SELECT e.id, e.first_name, e.last_name, r.title, d.name department, r.salary, m.first_name + m.last_name manager
         FROM employee e
         LEFT JOIN employee m ON e.manager_id = m.id
         JOIN role r ON e.role_id = r.id
-        JOIN department d ON r.department_id = d.id`,
-        (err, res) => {
-            if (err) throw err;
-            console.table(res);
-            displayMenu();
-        }
-    );
+        JOIN department d ON r.department_id = d.id`);
+
+    console.table(rows);
+    displayMenu();
 };
 
 const viewRoles = async () => {
-    await connection.query(
+    const [rows] = await connection.execute(
         `SELECT r.id, r.title, r.salary, d.name department
         FROM role r
-        JOIN department d ON r.department_id = d.id`,
-        (err, res) => {
-            if (err) throw err;
-            console.table(res);
-            displayMenu();
-        }
-    );
+        JOIN department d ON r.department_id = d.id`);
+
+    console.table(rows);
+    displayMenu();
+
 };
 
+const queryDepartments = async () => {
+    const [rows] = await connection.execute(
+        'SELECT * FROM departments');
+
+    return rows;
+}
+
 const viewDepartments = async () => {
-    await connection.query(
-        'SELECT * FROM departments',
-        (err, res) => {
-            if (err) throw err;
-            console.table(res);
-            displayMenu();
-        }
-    );
+    const rows = await queryDepartments();
+
+    console.table(rows);
+    displayMenu();
+
 };
 
 const insertEmployee = async () => {
@@ -143,6 +142,8 @@ const insertEmployee = async () => {
 };
 
 const insertRole = async () => {
+    const rows = await queryDepartments();
+
     // prompt for info about the role
     let answer = await inquirer.prompt([
         {
@@ -154,11 +155,15 @@ const insertRole = async () => {
             name: 'salary',
             type: 'input',
             message: "What is the salary for this role?",
+            validate(value) {
+                return isNaN(value) === false;
+            },
         },
         {
             name: 'department',
-            type: 'input',
+            type: 'list',
             message: "To which department does this role belong?",
+            choices: rows.map(r => r.name)
         },
     ]);
 
@@ -194,7 +199,7 @@ const insertDepartment = async () => {
     connection.query(
         'INSERT INTO department SET ?',
         {
-            name: answer.name,
+            ...answer
         },
         (err) => {
             if (err) throw err;

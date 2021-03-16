@@ -1,7 +1,7 @@
 // Enable access to .env variables
 require('dotenv').config();
 
-const mysql = require('mysql');
+const mysql = require('mysql2');
 
 const connection = mysql.createConnection({
     user: process.env.DB_USER,
