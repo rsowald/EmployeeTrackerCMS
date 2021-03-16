@@ -76,7 +76,9 @@ const viewEmployees = async () => {
 
 const viewRoles = async () => {
     await connection.query(
-        'SELECT * FROM roles',
+        `SELECT r.id, r.title, r.salary, d.name department
+        FROM role r
+        JOIN department d ON r.department_id = d.id`,
         (err, res) => {
             if (err) throw err;
             console.table(res);
