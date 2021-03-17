@@ -1,7 +1,7 @@
 // Enable access to .env variables
 require('dotenv').config();
 
-const mysql = require('mysql2');
+const mysql = require('mysql2/promise');
 
 const getConnection = async () => {
     return mysql.createConnection({

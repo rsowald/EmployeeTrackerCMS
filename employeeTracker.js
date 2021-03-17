@@ -1,5 +1,5 @@
 const inquirer = require('inquirer');
-const getConnection = require('db/connection');
+const getConnection = require('./db/connection');
 let connection;
 
 const displayMenu = async () => {
@@ -8,54 +8,26 @@ const displayMenu = async () => {
         type: 'list',
         message: 'What would you like to do?',
         choices: [
-            'View all employees',
-            'View all roles',
-            'View all departments',
-            'Add employee',
-            'Add role',
-            'Add department',
-            'Update employee role',
-            'exit',
+            { name: 'View all employees', value: viewEmployees },
+            { name: 'View all roles', value: viewRoles },
+            { name: 'View all departments', value: viewDepartments },
+            { name: 'Add employee', value: insertEmployee },
+            { name: 'Add role', value: insertRole },
+            { name: 'Add department', value: insertDepartment },
+            { name: 'Update employee role', value: updateEmployee },
+            { name: 'Exit', value: 'exit' },
         ]
     });
 
-    switch (answer.action) {
-        case 'View all employees':
-            viewEmployees();
-            break;
-
-        case 'View all roles':
-            viewRoles();
-            break;
-
-        case 'View all departments':
-            viewDepartments();
-            break;
-
-        case 'Add employee':
-            insertEmployee();
-            break;
-
-        case 'Add role':
-            insertRole();
-            break;
-
-        case 'Add department':
-            insertDepartment();
-            break;
-
-        case 'Update employee role':
-
-            break;
-
-        case 'Exit':
-            connection.end();
-            break;
-
-        default:
-            console.log(`Invalid action: ${answer.action}`);
-            break;
+    if (answer.action === 'exit') {
+        await endProgram();
     }
+    else {
+        const fn = answer.action;
+        await fn();
+        await displayMenu();
+    }
+
 };
 
 const queryEmployees = async () => {
@@ -72,7 +44,6 @@ const queryEmployees = async () => {
 const viewEmployees = async () => {
     const rows = await queryEmployees();
     console.table(rows);
-    displayMenu();
 };
 
 const queryRoles = async () => {
@@ -81,14 +52,14 @@ const queryRoles = async () => {
         FROM role r
         JOIN department d ON r.department_id = d.id`);
 
-    return rows
+    console.table(rows)
+
+    return rows;
 }
 
 const viewRoles = async () => {
     const rows = await queryRoles();
     console.table(rows);
-    displayMenu();
-
 };
 
 const queryDepartments = async () => {
@@ -102,36 +73,38 @@ const viewDepartments = async () => {
     const rows = await queryDepartments();
 
     console.table(rows);
-    displayMenu();
-
 };
 
 const insertEmployee = async () => {
     const roles = await queryRoles();
+    if (roles.length === 0) {
+        console.log('You must first create a role.');
+        return;
+    }
     const employees = await queryEmployees();
     // prompt for info about the employee
     const answer = await inquirer.prompt([
         {
-            name: 'firstName',
+            name: 'first_name',
             type: 'input',
             message: "What is the employee's first name?",
         },
         {
-            name: 'lastName',
+            name: 'last_name',
             type: 'input',
             message: "What is the employee's last name?",
         },
         {
-            name: 'role',
-            type: 'input',
+            name: 'role_id',
+            type: 'list',
             message: "What is their job title?",
-            choices: roles.map(r => r.name),
+            choices: roles.map(r => ({ name: r.title, value: r.id })),
         },
         {
-            name: 'manager',
-            type: 'input',
-            message: "What is their manager's name? (leave blank if NULL)",
-            choices: employees.map(r => r.first_name + r.last_name)
+            name: 'manager_id',
+            type: 'list',
+            message: "What is their manager's name?",
+            choices: [{ name: "none", value: null }].concat(employees.map(r => ({ name: r.first_name + r.last_name, value: r.id })))
         }
     ]);
 
@@ -139,16 +112,9 @@ const insertEmployee = async () => {
     await connection.execute(
         'INSERT INTO employee SET ?',
         {
-            first_name: answer.firstName,
-            last_name: answer.lastName,
-            role_id: answer.role,
-            //TODO: get role ids from role table
-            manager_id: answer.manager || NULL,
+            ...answer
         });
     console.log('Your employee was added successfully!');
-    // re-direct to the menu
-    displayMenu();
-
 };
 
 const insertRole = async () => {
@@ -184,10 +150,15 @@ const insertRole = async () => {
             ...answer
         });
     console.log('The role was added successfully!');
-    // re-direct to the menu
-    displayMenu();
+};
+
+const updateEmployee = async () => {
 
 };
+
+const endProgram = async () => {
+    await connection.end();
+}
 
 const insertDepartment = async () => {
     // prompt for info about the role
@@ -206,8 +177,6 @@ const insertDepartment = async () => {
             ...answer
         });
     console.log('The department was added successfully!');
-    // re-direct to the menu
-    displayMenu();
 
 };
 
