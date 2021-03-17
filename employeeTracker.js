@@ -1,10 +1,9 @@
 const inquirer = require('inquirer');
-const connection = require('db/connection');
-const { Z_UNKNOWN } = require('node:zlib');
-const { SSL_OP_TLS_D5_BUG } = require('node:constants');
+const getConnection = require('db/connection');
+let connection;
 
 const displayMenu = async () => {
-    let answer = await inquirer.prompt({
+    const answer = await inquirer.prompt({
         name: 'action',
         type: 'list',
         message: 'What would you like to do?',
@@ -59,7 +58,7 @@ const displayMenu = async () => {
     }
 };
 
-const viewEmployees = async () => {
+const queryEmployees = async () => {
     const [rows] = await connection.execute(
         `SELECT e.id, e.first_name, e.last_name, r.title, d.name department, r.salary, m.first_name + m.last_name manager
         FROM employee e
@@ -67,6 +66,11 @@ const viewEmployees = async () => {
         JOIN role r ON e.role_id = r.id
         JOIN department d ON r.department_id = d.id`);
 
+    return rows;
+};
+
+const viewEmployees = async () => {
+    const rows = await queryEmployees();
     console.table(rows);
     displayMenu();
 };
@@ -103,9 +107,10 @@ const viewDepartments = async () => {
 };
 
 const insertEmployee = async () => {
-
+    const roles = await queryRoles();
+    const employees = await queryEmployees();
     // prompt for info about the employee
-    let answer = await inquirer.prompt([
+    const answer = await inquirer.prompt([
         {
             name: 'firstName',
             type: 'input',
@@ -120,16 +125,18 @@ const insertEmployee = async () => {
             name: 'role',
             type: 'input',
             message: "What is their job title?",
+            choices: roles.map(r => r.name),
         },
         {
             name: 'manager',
             type: 'input',
-            message: "What is their manager's id? (leave blank if NULL)",
+            message: "What is their manager's name? (leave blank if NULL)",
+            choices: employees.map(r => r.first_name + r.last_name)
         }
     ]);
 
     // when finished prompting, insert a employee into the db with that info
-    connection.query(
+    await connection.execute(
         'INSERT INTO employee SET ?',
         {
             first_name: answer.firstName,
@@ -137,21 +144,18 @@ const insertEmployee = async () => {
             role_id: answer.role,
             //TODO: get role ids from role table
             manager_id: answer.manager || NULL,
-        },
-        (err) => {
-            if (err) throw err;
-            console.log('Your employee was added successfully!');
-            // re-direct to the menu
-            runMenu();
-        }
-    );
+        });
+    console.log('Your employee was added successfully!');
+    // re-direct to the menu
+    displayMenu();
+
 };
 
 const insertRole = async () => {
-    let rows = await queryDepartments();
+    const rows = await queryDepartments();
 
     // prompt for info about the role
-    let answer = await inquirer.prompt([
+    const answer = await inquirer.prompt([
         {
             name: 'title',
             type: 'input',
@@ -166,33 +170,28 @@ const insertRole = async () => {
             },
         },
         {
-            name: 'department',
+            name: 'department_id',
             type: 'list',
             message: "To which department does this role belong?",
-            choices: rows.map(r => r.name)
+            choices: rows.map(r => ({ name: r.name, value: r.id }))
         },
     ]);
 
     // when finished prompting, insert a role into the db with that info
-    connection.query(
+    await connection.execute(
         'INSERT INTO role SET ?',
         {
-            title: answer.title,
-            salary: answer.salary,
-            department: answer.department,
-        },
-        (err) => {
-            if (err) throw err;
-            console.log('The role was added successfully!');
-            // re-direct to the menu
-            runMenu();
-        }
-    );
+            ...answer
+        });
+    console.log('The role was added successfully!');
+    // re-direct to the menu
+    displayMenu();
+
 };
 
 const insertDepartment = async () => {
     // prompt for info about the role
-    let answer = await inquirer.prompt([
+    const answer = await inquirer.prompt([
         {
             name: 'name',
             type: 'input',
@@ -201,21 +200,20 @@ const insertDepartment = async () => {
     ]);
 
     // when finished prompting, insert a department into the db with that info
-    connection.query(
+    await connection.execute(
         'INSERT INTO department SET ?',
         {
             ...answer
-        },
-        (err) => {
-            if (err) throw err;
-            console.log('The department was added successfully!');
-            // re-direct to the menu
-            runMenu();
-        }
-    );
+        });
+    console.log('The department was added successfully!');
+    // re-direct to the menu
+    displayMenu();
+
 };
 
-connection.connect((err) => {
-    if (err) throw err;
-    runMenu();
-});
+async function main() {
+    connection = await getConnection();
+    await displayMenu();
+};
+
+main();
