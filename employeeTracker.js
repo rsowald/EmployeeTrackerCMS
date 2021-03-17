@@ -71,12 +71,17 @@ const viewEmployees = async () => {
     displayMenu();
 };
 
-const viewRoles = async () => {
+const queryRoles = async () => {
     const [rows] = await connection.execute(
         `SELECT r.id, r.title, r.salary, d.name department
         FROM role r
         JOIN department d ON r.department_id = d.id`);
 
+    return rows
+}
+
+const viewRoles = async () => {
+    const rows = await queryRoles();
     console.table(rows);
     displayMenu();
 
@@ -98,6 +103,7 @@ const viewDepartments = async () => {
 };
 
 const insertEmployee = async () => {
+
     // prompt for info about the employee
     let answer = await inquirer.prompt([
         {
@@ -142,7 +148,7 @@ const insertEmployee = async () => {
 };
 
 const insertRole = async () => {
-    const rows = await queryDepartments();
+    let rows = await queryDepartments();
 
     // prompt for info about the role
     let answer = await inquirer.prompt([
@@ -174,7 +180,6 @@ const insertRole = async () => {
             title: answer.title,
             salary: answer.salary,
             department: answer.department,
-            //TODO: get department ids from department table
         },
         (err) => {
             if (err) throw err;
