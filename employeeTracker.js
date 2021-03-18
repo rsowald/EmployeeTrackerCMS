@@ -56,8 +56,6 @@ const queryRoles = async () => {
         JOIN department d ON r.department_id = d.id
         ORDER BY r.title`);
 
-    console.table(rows)
-
     return rows;
 }
 
@@ -227,10 +225,10 @@ const updateEmployeeManager = async () => {
         }
     ]);
     await connection.query(
-        'UPDATE employee SET role_id = ? WHERE id= ?',
-        [answer.role_id, answer2.employee_id]
+        'UPDATE employee SET manager_id = ? WHERE id= ?',
+        [answer2.manager_id, answer.employee_id]
     );
-    console.log('The employee role was successfully updated!')
+    console.log("The employee's manager was successfully updated!")
 };
 
 const endProgram = async () => {
