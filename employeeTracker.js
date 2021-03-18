@@ -17,6 +17,7 @@ const displayMenu = async () => {
             { name: 'Add department', value: insertDepartment },
             { name: 'Update employee role', value: updateEmployeeRole },
             { name: 'Update employee manager', value: updateEmployeeManager },
+            { name: 'Remove employee', value: deleteEmployee },
             { name: 'Exit', value: 'exit' },
         ]
     });
@@ -231,9 +232,27 @@ const updateEmployeeManager = async () => {
     console.log("The employee's manager was successfully updated!")
 };
 
+const deleteEmployee = async () => {
+    const employees = await queryEmployees();
+    const answer = inquirer.prompt([
+        {
+            name: 'employee_id',
+            type: 'list',
+            message: "Which employee would you like to remove?",
+            choices: employees.map(r => ({ name: r.first_name + " " + r.last_name, value: r.id }))
+        }
+    ]);
+    await connection.query(
+        'UPDATE employee SET manager_id = null WHERE id=?', [answer.employee_id]
+    );
+    await connection.query(
+        'DELETE FROM employee WHERE id=?', [answer.employee_id]
+    );
+};
+
 const endProgram = async () => {
     await connection.end();
-}
+};
 
 
 
