@@ -17,6 +17,7 @@ const displayMenu = async () => {
             { name: 'Add department', value: insertDepartment },
             { name: 'Update employee role', value: updateEmployeeRole },
             { name: 'Update employee manager', value: updateEmployeeManager },
+            { name: 'View employees by manager', value: viewEmployeesByManager },
             { name: 'Remove employee', value: deleteEmployee },
             { name: 'Display department budgets', value: displayBudgets },
             { name: 'Exit', value: 'exit' },
@@ -49,6 +50,27 @@ const queryEmployees = async () => {
 const viewEmployees = async () => {
     const rows = await queryEmployees();
     console.table(rows);
+};
+
+const viewEmployeesByManager = async () => {
+    const [rows] = await connection.execute(
+        `SELECT DISTINCT m.id, m.first_name, m.last_name
+                FROM employee m
+                JOIN employee e ON m.id = e.manager_id
+                ORDER BY m.first_name;`
+    )
+    const answer = await inquirer.prompt([
+        {
+            name: 'manager_id',
+            type: 'list',
+            message: "Which manager's employees would you like to view?",
+            choices: rows.map(r => ({ name: r.first_name + " " + r.last_name, value: r.id }))
+        },
+    ]);
+    const [employees] = await connection.execute(
+        'SELECT e.id, e.first_name, e.last_name, r.title, d.name department, r.salary, CONCAT(m.first_name, " ", m.last_name)  manager FROM employee e   LEFT JOIN employee m ON e.manager_id = m.id JOIN role r ON e.role_id = r.id JOIN department d ON r.department_id = d.id WHERE e.manager_id = ? ORDER BY e.id', [answer.manager_id]
+    );
+    console.table(employees);
 };
 
 const queryRoles = async () => {
