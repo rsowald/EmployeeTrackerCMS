@@ -40,7 +40,7 @@ const queryEmployees = async () => {
         LEFT JOIN employee m ON e.manager_id = m.id
         JOIN role r ON e.role_id = r.id
         JOIN department d ON r.department_id = d.id
-        ORDER BY e.first_name`);
+        ORDER BY e.id`);
 
     return rows;
 };
@@ -55,7 +55,7 @@ const queryRoles = async () => {
         `SELECT r.id, r.title, r.salary, d.name department
         FROM role r
         JOIN department d ON r.department_id = d.id
-        ORDER BY r.title`);
+        ORDER BY r.id`);
 
     return rows;
 }
@@ -68,7 +68,7 @@ const viewRoles = async () => {
 const queryDepartments = async () => {
     const [rows] = await connection.execute(
         `SELECT * FROM department
-        ORDER BY name`);
+        ORDER BY id`);
 
     return rows;
 }
@@ -234,7 +234,7 @@ const updateEmployeeManager = async () => {
 
 const deleteEmployee = async () => {
     const employees = await queryEmployees();
-    const answer = inquirer.prompt([
+    const answer = await inquirer.prompt([
         {
             name: 'employee_id',
             type: 'list',
@@ -248,6 +248,7 @@ const deleteEmployee = async () => {
     await connection.query(
         'DELETE FROM employee WHERE id=?', [answer.employee_id]
     );
+    console.log('The employee was successfully removed!')
 };
 
 const endProgram = async () => {
