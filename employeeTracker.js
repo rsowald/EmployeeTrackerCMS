@@ -18,6 +18,7 @@ const displayMenu = async () => {
             { name: 'Update employee role', value: updateEmployeeRole },
             { name: 'Update employee manager', value: updateEmployeeManager },
             { name: 'Remove employee', value: deleteEmployee },
+            { name: 'Display department budgets', value: displayBudgets },
             { name: 'Exit', value: 'exit' },
         ]
     });
@@ -250,6 +251,21 @@ const deleteEmployee = async () => {
     );
     console.log('The employee was successfully removed!')
 };
+
+const displayBudgets = async () => {
+    const [rows] = await connection.execute(
+        `SELECT d.name department, SUM(salary) budget  
+        FROM role r
+        JOIN department d ON r.department_id = d.id
+        JOIN employee e ON r.id = e.role_id
+        
+        GROUP BY d.name
+        ORDER BY budget DESC`
+    );
+
+    console.table(rows);
+};
+
 
 const endProgram = async () => {
     await connection.end();
