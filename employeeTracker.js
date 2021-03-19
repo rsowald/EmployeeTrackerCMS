@@ -3,6 +3,7 @@ const cTable = require('console.table');
 const getConnection = require('./db/connection');
 let connection;
 
+//main menu
 const displayMenu = async () => {
     const answer = await inquirer.prompt({
         name: 'action',
@@ -23,10 +24,11 @@ const displayMenu = async () => {
             { name: 'Exit', value: 'exit' },
         ]
     });
-
+    //the only case that will end program
     if (answer.action === 'exit') {
         await endProgram();
     }
+    //will re-prompt main menu after the selected function runs 
     else {
         const fn = answer.action;
         await fn();
@@ -34,8 +36,9 @@ const displayMenu = async () => {
     }
 
 };
-
+// query employees separately so it's available to use in multiple methods
 const queryEmployees = async () => {
+    //connection.execute does not require a callback function, but does require that the output is stored in an array
     const [rows] = await connection.execute(
         `SELECT e.id, e.first_name, e.last_name, r.title, d.name department, r.salary, CONCAT(m.first_name, " ", m.last_name)  manager
         FROM employee e
@@ -54,6 +57,7 @@ const viewEmployees = async () => {
 
 const viewEmployeesByManager = async () => {
     const [rows] = await connection.execute(
+        //selecting distinct so that managers with multiple employees under them don't appear twice
         `SELECT DISTINCT m.id, m.first_name, m.last_name
                 FROM employee m
                 JOIN employee e ON m.id = e.manager_id
@@ -103,6 +107,7 @@ const viewDepartments = async () => {
 };
 
 const insertEmployee = async () => {
+    //role is a required field in employee table, so there must be a role available first
     const roles = await queryRoles();
     if (roles.length === 0) {
         console.log('You must first create a role.');
@@ -136,6 +141,7 @@ const insertEmployee = async () => {
     ]);
 
     // when finished prompting, insert a employee into the db with that info
+    // when nothing needs to be returned, I can use connection.query without a callback
     await connection.query(
         'INSERT INTO employee SET ?',
         {
@@ -145,6 +151,7 @@ const insertEmployee = async () => {
 };
 
 const insertRole = async () => {
+    //department is a required field in role table, so there must be a department available first
     const rows = await queryDepartments();
     if (rows.length === 0) {
         console.log('You must first create a department.');
@@ -183,7 +190,7 @@ const insertRole = async () => {
 };
 
 const insertDepartment = async () => {
-    // prompt for info about the role
+    // prompt for info about the department
     const answer = await inquirer.prompt([
         {
             name: 'name',
@@ -236,6 +243,7 @@ const updateEmployeeManager = async () => {
             choices: employees.map(r => ({ name: r.first_name + " " + r.last_name, value: r.id }))
         }
     ]);
+    //when giving manager choices, I excluded the employee themselves and included a none/null option
     const allExceptSelectedEmp = employees
         .filter(r => answer.employee_id !== r.id)
         .map(r => ({ name: r.first_name + " " + r.last_name, value: r.id }));
@@ -293,8 +301,7 @@ const endProgram = async () => {
     await connection.end();
 };
 
-
-
+//async/await wrapper to get the connection before initializing the menu prompt
 async function main() {
     connection = await getConnection();
     await displayMenu();

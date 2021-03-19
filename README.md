@@ -4,7 +4,7 @@
   
   ## Description
   
-  This is a command-line content management system for a business owner or manager to track all employees and the details of their positions.
+  This is a command-line content management system for a business owner or manager to track all employees and the details of their positions. It utilizes node and the Inquirer npm package to collect data from a user and MySQL to connect to a database to store and retrieve that data. The data is stored in three tables that use different kinds of MySQL joins to retrieve any data the user needs. Finally, it uses the npm package Console.table to return visually appealing data tables in response to the user's requests.
   
   ![application image](/assets/screenshot.jpg)
   
@@ -14,6 +14,7 @@
   * [Installation](#installation)
   * [Usage](#usage)
   * [Tests](#tests)
+  * [Future](#futureFeatures)
   * [Contributing](#contributing)
   * [License](#license)
   * [Questions](#questions)
@@ -48,6 +49,9 @@
   ## Tests
   no tests
   
+## FutureFeatures
+Ultimately, I would like to have a deployed UI and a database in the cloud for this application to simplify the user experience and make the content display much more attractive.
+
   ## Questions
   
   For more information:
