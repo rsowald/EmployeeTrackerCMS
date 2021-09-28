@@ -14,44 +14,47 @@ export default function Home() {
 
       <main className={styles.main}>
         <h1 className={styles.title}>
-          Add New Employee {' '}
-          <Link href="/new-employee">
-            <a>here.</a>
-          </Link>
+          Manager's Dashboard
         </h1>
 
         <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
+          Hello{' '}
+          <code className={styles.code}>Placeholder</code>
         </p>
 
         <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h2>Documentation &rarr;</h2>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
 
           <a href="https://nextjs.org/learn" className={styles.card}>
-            <h2>Learn &rarr;</h2>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
+            <h2>Snapshots</h2>
+            <p>Employees &rarr;</p>
+            <p>Roles &rarr;</p>
+            <p>Departments &rarr;</p>
           </a>
+
+          <div className={styles.card}>
+            <h2>Add</h2>
+            <a href="/new-employee">New Employee &rarr;</a>
+            <p>New Role &rarr;</p>
+            <p>New Department &rarr;</p>
+          </div>
 
           <a
             href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h2>Examples &rarr;</h2>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
+            className={styles.card}>
+            <h2>Update Employee</h2>
+            <p>Role &rarr;</p>
+            <p>Manager &rarr;</p>
+            <p>Remove &rarr;</p>
           </a>
 
           <a
             href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
             className={styles.card}
           >
-            <h2>Deploy &rarr;</h2>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
+            <h2>Budget &rarr;</h2>
+            <p>Total</p>
+            <p>By Department</p>
+            <p>By Manager</p>
           </a>
         </div>
       </main>
