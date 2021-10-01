@@ -1,0 +1,11 @@
+.delete {
+    color: white;
+    background-color: red;
+    border-radius: 5px;
+}
+
+.add {
+    color: white;
+    background-color: green;
+    border-radius: 5px;
+}
