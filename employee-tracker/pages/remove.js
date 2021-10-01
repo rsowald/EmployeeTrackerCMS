@@ -9,11 +9,6 @@ export default function Removing() {
             <Head>
                 <title>Remove</title>
             </Head>
-            <nav>
-                <Link href="/">
-                    <a>Back to home</a>
-                </Link>
-            </nav>
             <h1>Pruning Your Business</h1>
             <h2>Remove An Employee</h2>
             <DeleteButton />

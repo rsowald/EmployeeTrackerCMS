@@ -24,11 +24,20 @@ export default function Home() {
 
         <div className={styles.grid}>
 
-          <a href="https://nextjs.org/learn" className={styles.card}>
+          <a href="/view" className={styles.card}>
             <h2>Snapshots</h2>
             <p>Employees &rarr;</p>
             <p>Roles &rarr;</p>
             <p>Departments &rarr;</p>
+          </a>
+
+          <a
+            href="/budget" className={styles.card}
+          >
+            <h2>Budget &rarr;</h2>
+            <p>Total</p>
+            <p>By Department</p>
+            <p>By Manager</p>
           </a>
 
           <a href="/add" className={styles.card}>
@@ -36,24 +45,13 @@ export default function Home() {
             <p>New Employee, Role, or Department</p>
           </a>
 
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}>
+          <a href="/remove" className={styles.card}>
             <h2>Update Employee</h2>
             <p>Role &rarr;</p>
             <p>Manager &rarr;</p>
-            <a href="/remove">Remove &rarr;</a>
+            <p>Remove &rarr;</p>
           </a>
 
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h2>Budget &rarr;</h2>
-            <p>Total</p>
-            <p>By Department</p>
-            <p>By Manager</p>
-          </a>
         </div>
       </main>
 
