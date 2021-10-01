@@ -31,12 +31,10 @@ export default function Home() {
             <p>Departments &rarr;</p>
           </a>
 
-          <div className={styles.card}>
-            <h2>Add</h2>
-            <a href="/new-employee">New Employee &rarr;</a>
-            <p>New Role &rarr;</p>
-            <p>New Department &rarr;</p>
-          </div>
+          <a href="/add" className={styles.card}>
+            <h2>Add &rarr;</h2>
+            <p>New Employee, Role, or Department</p>
+          </a>
 
           <a
             href="https://github.com/vercel/next.js/tree/master/examples"
@@ -44,7 +42,7 @@ export default function Home() {
             <h2>Update Employee</h2>
             <p>Role &rarr;</p>
             <p>Manager &rarr;</p>
-            <p>Remove &rarr;</p>
+            <a href="/remove">Remove &rarr;</a>
           </a>
 
           <a
